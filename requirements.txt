@@ -1,0 +1,3 @@
+FalkorDB
+fastapi
+uvicorn

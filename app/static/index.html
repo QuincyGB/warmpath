@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WarmPath — who can intro me?</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 860px; padding: 0 1rem; }
+  h1 { font-size: 1.5rem; } h2 { font-size: 1.1rem; margin-top: 2rem; }
+  textarea { width: 100%; height: 110px; font-family: monospace; }
+  button { padding: .45rem .9rem; margin: .4rem .3rem .4rem 0; cursor: pointer; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #ccc; padding: .45rem; text-align: left; vertical-align: top; }
+  .demo { background: #fff3cd; border-radius: 4px; padding: 0 .35rem; font-size: .8em; }
+  pre { background: #f4f4f4; padding: .8rem; white-space: pre-wrap; }
+  .path { font-family: monospace; font-size: .9em; }
+</style>
+</head>
+<body>
+<h1>WarmPath</h1>
+<p>Your market as a living graph in FalkorDB. Every answer shows the path behind it.</p>
+
+<button onclick="seed()">Seed demo network</button>
+<button onclick="loadCallList()">Load ranked call list</button>
+<span id="status"></span>
+
+<h2>1. Paste contacts (CSV)</h2>
+<p>Header: <code>name,company,role,knows</code> — <i>knows</i> is semicolon-separated names already in the graph.</p>
+<textarea id="csv">name,company,role,knows
+Dana Lee,BrightMart,VP Operations,Quincy
+Sam Ortiz,BrightMart,Procurement Lead,Dana Lee</textarea>
+<br><button onclick="ingest()">Ingest CSV</button>
+
+<h2>2. Ranked call list — why this account, why now</h2>
+<div id="calllist"><i>Seed the demo network, then load the call list.</i></div>
+
+<h2>3. Outreach draft</h2>
+<input id="target" placeholder="Target person (e.g. Leo Marsh)" size="32">
+<button onclick="outreach()">Draft intro request</button>
+<pre id="draft"></pre>
+
+<script>
+async function seed() {
+  const r = await fetch('/seed', {method: 'POST'});
+  document.getElementById('status').textContent = 'Seeded: ' + JSON.stringify(await r.json());
+  loadCallList();
+}
+async function ingest() {
+  const body = document.getElementById('csv').value;
+  const r = await fetch('/ingest', {method: 'POST', headers: {'Content-Type': 'text/plain'}, body});
+  document.getElementById('status').textContent = 'Ingested: ' + JSON.stringify(await r.json());
+  loadCallList();
+}
+async function loadCallList() {
+  const r = await fetch('/call-list');
+  const data = await r.json();
+  if (!data.call_list.length) { document.getElementById('calllist').innerHTML = '<i>No warm accounts yet.</i>'; return; }
+  let html = '<table><tr><th>Company</th><th>Contact</th><th>Intro path</th><th>Why now</th></tr>';
+  for (const row of data.call_list) {
+    const why = row.why_now
+      ? row.why_now.text + ' <small>(' + row.why_now.kind + ', ' + row.why_now.date + ')</small>' +
+        (row.why_now.source === 'demo-seed' ? ' <span class="demo">demo data</span>' : '')
+      : '<i>no signal yet</i>';
+    const notes = row.notes_on_path.length
+      ? '<br><small>Notes: ' + row.notes_on_path.map(n => n.person + ': ' + n.text).join(' · ') + '</small>' : '';
+    html += '<tr><td>' + row.company + '</td><td>' + row.contact.name + '<br><small>' +
+      (row.contact.title || '') + '</small></td><td class="path">' + row.path.join(' → ') +
+      '</td><td>' + why + notes + '</td></tr>';
+  }
+  document.getElementById('calllist').innerHTML = html + '</table>';
+}
+async function outreach() {
+  const target = document.getElementById('target').value;
+  const r = await fetch('/outreach', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({target})});
+  const data = await r.json();
+  document.getElementById('draft').textContent = data.draft || data.reason || '';
+}
+</script>
+</body>
+</html>
