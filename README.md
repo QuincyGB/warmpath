@@ -1,5 +1,10 @@
 # WarmPath — graph-powered sales intelligence
 
+**Live deployment:** https://warmpath-2zfg.onrender.com — FastAPI on Render,
+backed by a FalkorDB Cloud instance. Try it: `POST /seed`, then
+`GET /intro-path?target=Leo%20Marsh` (best path: Quincy → Kim Osei → Leo Marsh).
+Note: the free tier spins down when idle, so the first request may take ~1 min.
+
 Graph Hacks: Context for AI Agents (WeMakeDevs × FalkorDB), Track 01 —
 Agents That Act on Connected Data. Build window: Oct 15–18, 2026 IST
 (Toronto: Wed Oct 14, 2:31 PM EDT → Sun Oct 18, 2:29 PM EDT).
