@@ -1,0 +1,26 @@
+# Render blueprint — WarmPath API (Graph Hacks submission).
+# FalkorDB is external (FalkorDB Cloud free instance); set the FALKORDB_*
+# values in the Render dashboard from the Cloud instance's connection details.
+services:
+  - type: web
+    name: warmpath
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      # Option A (preferred): the single connection URL from FalkorDB Cloud.
+      - key: FALKORDB_URL
+        sync: false
+      # Option B: discrete connection details (used only if FALKORDB_URL unset).
+      - key: FALKORDB_HOST
+        sync: false
+      - key: FALKORDB_PORT
+        sync: false
+      - key: FALKORDB_USERNAME
+        sync: false
+      - key: FALKORDB_PASSWORD
+        sync: false

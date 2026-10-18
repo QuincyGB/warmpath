@@ -11,12 +11,35 @@ from falkordb import FalkorDB
 GRAPH_NAME = os.environ.get("WARMPATH_GRAPH", "warmpath")
 
 
+def _connect():
+    """FalkorDB connection, fully env-configurable (defaults = local dev).
+
+    Precedence:
+      1. FALKORDB_URL — full connection URL, e.g.
+         redis://user:password@host:port  (rediss:// for TLS).
+         This is the format FalkorDB Cloud hands out.
+      2. Discrete vars: FALKORDB_HOST (default 127.0.0.1),
+         FALKORDB_PORT (default 6379), FALKORDB_USERNAME,
+         FALKORDB_PASSWORD, FALKORDB_SSL=1 for TLS without a URL.
+    """
+    url = os.environ.get("FALKORDB_URL")
+    if url:
+        return FalkorDB.from_url(url)
+    kwargs = {
+        "host": os.environ.get("FALKORDB_HOST", "127.0.0.1"),
+        "port": int(os.environ.get("FALKORDB_PORT", "6379")),
+    }
+    if os.environ.get("FALKORDB_USERNAME"):
+        kwargs["username"] = os.environ["FALKORDB_USERNAME"]
+    if os.environ.get("FALKORDB_PASSWORD"):
+        kwargs["password"] = os.environ["FALKORDB_PASSWORD"]
+    if os.environ.get("FALKORDB_SSL", "").lower() in ("1", "true", "yes"):
+        kwargs["ssl"] = True
+    return FalkorDB(**kwargs)
+
+
 def get_graph():
-    db = FalkorDB(
-        host=os.environ.get("FALKORDB_HOST", "127.0.0.1"),
-        port=int(os.environ.get("FALKORDB_PORT", "6379")),
-    )
-    return db.select_graph(GRAPH_NAME)
+    return _connect().select_graph(GRAPH_NAME)
 
 
 SEED_PEOPLE = [

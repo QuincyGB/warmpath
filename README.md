@@ -64,9 +64,13 @@ Quincy → Kim Osei → Leo Marsh.
 
 - Demo video recorded from the real running app (seed → ranked call list →
   intro path to Leo Marsh → outreach draft), ~2 minutes, narrated.
-- Deployment: **local demo only** — no hosted URL. The app runs anywhere
-  FalkorDB runs; see Run above. (A hosted deployment was optional for this
-  event; the repo + video are the submission artifacts.)
+- Deployment: the FalkorDB connection is fully env-configurable
+  (`FALKORDB_URL`, or `FALKORDB_HOST` / `FALKORDB_PORT` /
+  `FALKORDB_USERNAME` / `FALKORDB_PASSWORD` / `FALKORDB_SSL`; defaults are
+  local 127.0.0.1:6379, so local runs are unchanged). A Render blueprint
+  (`render.yaml`) deploys the API against a FalkorDB Cloud instance —
+  set the `FALKORDB_*` values from the Cloud instance in the Render
+  dashboard and the same code runs hosted or local.
 - Optional: blog-post side entry (AirPods 5) after submitting.
 
 AI assistance disclosure (event rule): this project was built with an AI
