@@ -22,11 +22,21 @@ intro me to X?"* — and shows the exact path behind every answer.
 
 ## Run
 
+FalkorDB is the primary store and the product's core — every feature below
+is a graph query against it. Start it first (or point `FALKORDB_HOST` /
+`FALKORDB_PORT` at any FalkorDB instance):
+
 ```bash
-# FalkorDB (absolute paths are load-bearing — see ../prep.md)
-/home/hatch/workspace/platform-sweeps/.venv/bin/python scripts/smoke_test.py
-uvicorn app.main:app --port 8000
+docker run -p 6379:6379 falkordb/falkordb   # FalkorDB on 127.0.0.1:6379
+pip install -r requirements.txt
+python scripts/smoke_test.py                # end-to-end: seed -> paths -> call list -> draft
+uvicorn app.main:app --port 8000            # UI at http://127.0.0.1:8000
 ```
+
+Demo flow (also the demo video): click **Seed demo network**, read the
+ranked call list (warm accounts with the path and "why now" behind each),
+then draft an intro request for **Leo Marsh** and watch it cite the path
+Quincy → Kim Osei → Leo Marsh.
 
 ## Day-2 state (2026-10-16, built + verified by Ren)
 
@@ -50,12 +60,13 @@ uvicorn app.main:app --port 8000
 - FalkorDB was found DOWN again on 2026-10-16 and restarted with the
   absolute-path command in `../prep.md`; it does not survive restarts.
 
-## Still to do (prep.md build order)
+## Submission state (Sun Oct 18, 2026)
 
-- Day 3 (Sat/Sun): deploy (FalkorDB Cloud or VPS), <3-min demo video
-  (seed → "how do I get into Northline Foods?" → Ana → Raj → Leo → outreach
-  draft), public repo, submit on WeMakeDevs before Sun Oct 18, 2:29 PM EDT
-  (target ~noon).
+- Demo video recorded from the real running app (seed → ranked call list →
+  intro path to Leo Marsh → outreach draft), ~2 minutes, narrated.
+- Deployment: **local demo only** — no hosted URL. The app runs anywhere
+  FalkorDB runs; see Run above. (A hosted deployment was optional for this
+  event; the repo + video are the submission artifacts.)
 - Optional: blog-post side entry (AirPods 5) after submitting.
 
 AI assistance disclosure (event rule): this project was built with an AI
